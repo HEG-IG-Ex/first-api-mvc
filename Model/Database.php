@@ -12,7 +12,7 @@ class Database
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
-    }
+    } 
     public function select($query = "", $params = [])
     {
         try {
@@ -20,6 +20,20 @@ class Database
             $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             $stmt->close();
             return $result;
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
+        return false;
+    }
+    public function insert($query = "", $params = [])
+    {
+        try {
+            $stmt = $this->executeStatement($query, $params);
+            if($stmt) {
+                return true;
+            } else {
+                return false;
+            }
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -33,7 +47,10 @@ class Database
                 throw new Exception("Unable to do prepared statement: " . $query);
             }
             if ($params) {
-                $stmt->bind_param($params[0], $params[1]);
+                $format = $params[0];
+                $data = array_shift($params);
+                print_r($data);
+                $stmt->bind_param($format, ...array_shift($params));
             }
             $stmt->execute();
             return $stmt;
