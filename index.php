@@ -8,8 +8,7 @@
     }
 
     require PROJECT_ROOT_PATH . "/Controller/Api/ClientController.php";
-    $objFeedController = new ClientController();
-    $strMethodName = $uri[4] . 'Action';
-    $objFeedController->{$strMethodName}();
+    $controller = new ClientController();
+    $controller->handleRequest();
 ?>
     

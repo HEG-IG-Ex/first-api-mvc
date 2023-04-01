@@ -1,3 +1,4 @@
 RewriteEngine on
 RewriteRule ^clients/list?$ index.php?%{QUERY_STRING}
 RewriteRule ^clients/id/([0-9]+)$ index.php?id=$1&%{QUERY_STRING}
+RewriteRule ^clients$ index.php?%{QUERY_STRING}

@@ -1,61 +1,24 @@
 <?php
 class Database
 {
-    protected $connection = null;
-    public function __construct()
-    {
+    private $conn;
+    public function __construct() {
         try {
-            $this->connection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE_NAME);
-            if (mysqli_connect_errno()) {
-                throw new Exception("Could not connect to database.");
-            }
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage());
+            $this->conn = new PDO("mysql:host=".DB_HOST.";dbname=".DB_DATABASE_NAME, DB_USERNAME, DB_PASSWORD);
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch(PDOException $e) {
+            echo "Connection failed: " . $e->getMessage();
         }
-    } 
-    public function select($query = "", $params = [])
-    {
-        try {
-            $stmt = $this->executeStatement($query, $params);
-            $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-            $stmt->close();
-            return $result;
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage());
-        }
-        return false;
     }
-    public function insert($query = "", $params = [])
-    {
+
+    public function execute($query, $params = array()) {
         try {
-            $stmt = $this->executeStatement($query, $params);
-            if($stmt) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage());
-        }
-        return false;
-    }
-    private function executeStatement($query = "", $params = [])
-    {
-        try {
-            $stmt = $this->connection->prepare($query);
-            if ($stmt === false) {
-                throw new Exception("Unable to do prepared statement: " . $query);
-            }
-            if ($params) {
-                $format = $params[0];
-                $data = array_shift($params);
-                print_r($data);
-                $stmt->bind_param($format, ...array_shift($params));
-            }
-            $stmt->execute();
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute($params);
             return $stmt;
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage());
+        } catch(PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return false;
         }
     }
 }
